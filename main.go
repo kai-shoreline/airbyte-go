@@ -18,7 +18,7 @@ func main() {
 		return
 	}
 	fmt.Println("Command started successfully!")
-	err = cmd.Wait()
+	err = cmd.Start()
 	if err != nil {
 		fmt.Println("Error waiting for command to finish:", err)
 	}
@@ -88,5 +88,11 @@ func main() {
 //     return
 //   }
 //   fmt.Println(string(body))
+
+
+  err = cmd.Process.Kill() // stop the command
+  if err != nil {
+      panic(err)
+  }
 
 }
