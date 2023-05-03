@@ -9,6 +9,33 @@ import (
   "time"
 )
 
+func main() {
+
+
+  cmd := exec.Command("kubectl", "port-forward", "service/airbyte-webapp-svc", "3000:80")
+	err := cmd.Start()
+	if err != nil {
+		fmt.Println("Error starting command:", err)
+		return
+	}
+	fmt.Println("Command started successfully!")
+	err = cmd.Start()
+	if err != nil {
+		fmt.Println("Error waiting for command to finish:", err)
+	}
+  time.Sleep(10 * time.Second)
+
+  getWorkspaceId()
+
+  getSourceDefinitionID()
+
+  err = cmd.Process.Kill() // stop the command
+  if err != nil {
+      panic(err)
+  }
+
+}
+
 func getWorkspaceId() {
   fmt.Println("test workspace")
 
@@ -81,29 +108,3 @@ func getSourceDefinitionID() {
   fmt.Println(string(body))
 }
 
-func main() {
-
-
-  cmd := exec.Command("kubectl", "port-forward", "service/airbyte-webapp-svc", "3000:80")
-	err := cmd.Start()
-	if err != nil {
-		fmt.Println("Error starting command:", err)
-		return
-	}
-	fmt.Println("Command started successfully!")
-	err = cmd.Start()
-	if err != nil {
-		fmt.Println("Error waiting for command to finish:", err)
-	}
-  time.Sleep(10 * time.Second)
-
-  getWorkspaceId()
-
-  getSourceDefinitionID()
-
-  err = cmd.Process.Kill() // stop the command
-  if err != nil {
-      panic(err)
-  }
-
-}
