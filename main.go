@@ -46,13 +46,12 @@ func main() {
 
 }
 
+
 func getWorkspaceId() string {
   url := "http://localhost:3000/api/v1/workspaces/list"
   res := postAPI(url, nil)
 
   data1 := res["workspaces"].([]interface{})[0].(map[string]interface {})
-  // data2 := data1[0].(map[string]interface {})
-  // fmt.Printf("%+v\n", data1["workspaceId"])
   return data1["workspaceId"].(string)
 }
  
@@ -71,13 +70,10 @@ func getSourceDefinitionID() string {
   }`)
   res := postAPI(url, payload)
   return res["sourceDefinitionId"].(string)
-
 }
 
 
 func getSourceDefinitionID2() string {
-  // fmt.Println("test getSourceDefinitionID2")
-
   url := "http://localhost:3000/api/v1/source_definitions/create_custom"
   payload := strings.NewReader(`{
     "workspaceId": "b36bb3f7-e6f9-4105-9d2a-4abd07bc5c1a",
@@ -100,7 +96,6 @@ func getDestinationID() string {
   res := postAPI(url, payload)
   return res["destinationId"].(string)
 }
-
 
 
 func postAPI(url string, payload io.Reader) map[string]interface{} {
@@ -126,7 +121,6 @@ func postAPI(url string, payload io.Reader) map[string]interface{} {
     fmt.Println(err)
     return nil
   }
-  // fmt.Println(string(body))
 
   var data map[string]interface{}
   err = json.Unmarshal([]byte(body), &data)
@@ -134,20 +128,4 @@ func postAPI(url string, payload io.Reader) map[string]interface{} {
       panic(err)
   }
   return data
-  // var data1 map[string]interface{}
-  // data1 := data["workspaces"].([]map[string]interface{})
-  // fmt.Printf("%+v\n", data1[0]["workspaceId"].(string))
-
-  // data1 := data["workspaces"].([]interface{})[0].(map[string]interface {})
-  // // data2 := data1[0].(map[string]interface {})
-  // fmt.Printf("%+v\n", data1["workspaceId"])
-
-
-
-	// var person Person
-	// err = json.Unmarshal([]byte(body), &person)
-
-  // fmt.Println(person.workspaces)
-
-
 }
