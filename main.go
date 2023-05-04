@@ -29,15 +29,20 @@ func main() {
   workspaceId := getWorkspaceId()
   fmt.Printf("%+v\n",workspaceId)
 
-  pugerdutyDefinitionId := getSourceDefinitionID()
-
+  pugerdutyDefinitionId := getSourceDefinitionID(workspaceId, "PD hist main1669083192-test2", "main1669083192", "892815091625.dkr.ecr.us-west-2.amazonaws.com/pagerduty-airbyte")
   fmt.Printf("%+v\n",pugerdutyDefinitionId)
 
-  opsgenieDefinitionId := getSourceDefinitionID2()
+  opsgenieDefinitionId := getSourceDefinitionID(workspaceId, "opsgenie-initial1672253312", "opsgenie-initial1672253312", "892815091625.dkr.ecr.us-west-2.amazonaws.com/opsgenie-airbyte")
   fmt.Printf("%+v\n",opsgenieDefinitionId)
 
-  destinationId := getDestinationID()
-  fmt.Printf("%+v\n",destinationId)
+  definitionId := getDestinationID("25c5221d-dce2-4163-ade9-739ef790f503", workspaceId, "f1PrBXKfKOxSObGbQLGQvs29ck7V6RLXEjyR9bZWUppxqdKpYO", "insights-cluster-jk.cluster-c4wzjyxeyphq.us-east-1.rds.amazonaws.com")
+  fmt.Printf("%+v\n",definitionId)
+
+  // opsgenieDefinitionId := getSourceDefinitionID2()
+  // fmt.Printf("%+v\n",opsgenieDefinitionId)
+
+  // destinationId := getDestinationID()
+  // fmt.Printf("%+v\n",destinationId)
   
   err = cmd.Process.Kill() // stop the command
   if err != nil {
@@ -54,45 +59,63 @@ func getWorkspaceId() string {
   data1 := res["workspaces"].([]interface{})[0].(map[string]interface {})
   return data1["workspaceId"].(string)
 }
+
+func getSourceDefinitionID(workspaceId string, name string, dockerImageTag string, dockerRepository string) string {
+
+  url := "http://localhost:3000/api/v1/source_definitions/create_custom"
+  payload := strings.NewReader(fmt.Sprintf(`{
+    "workspaceId": "%s",
+    "sourceDefinition": {
+        "name": "%s",
+        "documentationUrl": "",
+        "dockerImageTag": "%s",
+        "dockerRepository": "%s"
+    }
+  }`, workspaceId, name, dockerImageTag, dockerRepository))
+  // fmt.Printf("%+v\n",payload)
+  res := postAPI(url, payload)
+  return res["sourceDefinitionId"].(string)
+}
  
 
-func getSourceDefinitionID() string {
+// func getSourceDefinitionID() string {
 
-  url := "http://localhost:3000/api/v1/source_definitions/create_custom"
-  payload := strings.NewReader(`{
-    "workspaceId": "b36bb3f7-e6f9-4105-9d2a-4abd07bc5c1a",
-    "sourceDefinition": {
-        "name": "PD hist main1669083192-test2",
-        "documentationUrl": "",
-        "dockerImageTag": "main1669083192",
-        "dockerRepository": "892815091625.dkr.ecr.us-west-2.amazonaws.com/pagerduty-airbyte"
-    }
-  }`)
-  res := postAPI(url, payload)
-  return res["sourceDefinitionId"].(string)
-}
-
-
-func getSourceDefinitionID2() string {
-  url := "http://localhost:3000/api/v1/source_definitions/create_custom"
-  payload := strings.NewReader(`{
-    "workspaceId": "b36bb3f7-e6f9-4105-9d2a-4abd07bc5c1a",
-    "sourceDefinition": {
-        "name": "opsgenie-initial1672253312",
-        "documentationUrl": "",
-        "dockerImageTag": "opsgenie-initial1672253312",
-        "dockerRepository": "892815091625.dkr.ecr.us-west-2.amazonaws.com/opsgenie-airbyte"
-    }
-  }`)
-
-  res := postAPI(url, payload)
-  return res["sourceDefinitionId"].(string)
-}
+//   url := "http://localhost:3000/api/v1/source_definitions/create_custom"
+//   payload := strings.NewReader(`{
+//     "workspaceId": "b36bb3f7-e6f9-4105-9d2a-4abd07bc5c1a",
+//     "sourceDefinition": {
+//         "name": "PD hist main1669083192-test2",
+//         "documentationUrl": "",
+//         "dockerImageTag": "main1669083192",
+//         "dockerRepository": "892815091625.dkr.ecr.us-west-2.amazonaws.com/pagerduty-airbyte"
+//     }
+//   }`)
+//   res := postAPI(url, payload)
+//   return res["sourceDefinitionId"].(string)
+// }
 
 
-func getDestinationID() string {
+// func getSourceDefinitionID2() string {
+//   url := "http://localhost:3000/api/v1/source_definitions/create_custom"
+//   payload := strings.NewReader(`{
+//     "workspaceId": "b36bb3f7-e6f9-4105-9d2a-4abd07bc5c1a",
+//     "sourceDefinition": {
+//         "name": "opsgenie-initial1672253312",
+//         "documentationUrl": "",
+//         "dockerImageTag": "opsgenie-initial1672253312",
+//         "dockerRepository": "892815091625.dkr.ecr.us-west-2.amazonaws.com/opsgenie-airbyte"
+//     }
+//   }`)
+
+//   res := postAPI(url, payload)
+//   return res["sourceDefinitionId"].(string)
+// }
+
+
+func getDestinationID(destinationDefinitionId string, workspaceId string, password string, host string) string {
   url := "http://localhost:3000/api/v1/destinations/create"
-  payload := strings.NewReader(`{"name":"Postgres","destinationDefinitionId":"25c5221d-dce2-4163-ade9-739ef790f503","workspaceId":"b36bb3f7-e6f9-4105-9d2a-4abd07bc5c1a","connectionConfiguration":{"tunnel_method":{"tunnel_method":"NO_TUNNEL"},"username":"postgres","ssl_mode":{"mode":"disable"},"password":"f1PrBXKfKOxSObGbQLGQvs29ck7V6RLXEjyR9bZWUppxqdKpYO","database":"postgres","schema":"public","port":5432,"host":"insights-cluster-jk.cluster-c4wzjyxeyphq.us-east-1.rds.amazonaws.com","ssl":false}}`)
+  payload := strings.NewReader(fmt.Sprintf(`{"name":"Postgres","destinationDefinitionId":"%s","workspaceId":"%s","connectionConfiguration":{"tunnel_method":{"tunnel_method":"NO_TUNNEL"},"username":"postgres","ssl_mode":{"mode":"disable"},"password":"%s","database":"postgres","schema":"public","port":5432,"host":"%s","ssl":false}}`, destinationDefinitionId, workspaceId, password, host))
+  // fmt.Printf("%+v\n",payload)
   res := postAPI(url, payload)
   return res["destinationId"].(string)
 }
