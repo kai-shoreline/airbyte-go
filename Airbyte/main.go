@@ -35,6 +35,9 @@ func main() {
   opsgenieDefinitionId := getSourceDefinitionID(workspaceId, "opsgenie-initial1672253312", "opsgenie-initial1672253312", "892815091625.dkr.ecr.us-west-2.amazonaws.com/opsgenie-airbyte")
   fmt.Printf("%+v\n",opsgenieDefinitionId)
 
+  postgresDefinitionId := getDestinationDefinitionID(workspaceId, "postgres")
+  fmt.Printf("%+v\n",postgresDefinitionId)
+
   definitionId := getDestinationID("25c5221d-dce2-4163-ade9-739ef790f503", workspaceId, "f1PrBXKfKOxSObGbQLGQvs29ck7V6RLXEjyR9bZWUppxqdKpYO", "insights-cluster-jk.cluster-c4wzjyxeyphq.us-east-1.rds.amazonaws.com")
   fmt.Printf("%+v\n",definitionId)
   
@@ -43,6 +46,14 @@ func main() {
       panic(err)
   }
 
+}
+
+func getDestinationDefinitionID(workspaceId string, database string) string {
+  url := "http://localhost:3000/api/v1/destination_definitions/list_latest"
+  payload := strings.NewReader(fmt.Sprintf(`{"workspaceId":"%s"}`, workspaceId))
+  // fmt.Printf("%+v\n",payload)
+  res := postAPI(url, payload)
+  return res["destinationId"].(string)  
 }
 
 
