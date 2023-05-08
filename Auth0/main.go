@@ -25,11 +25,6 @@ func main() {
 	script2 := fmt.Sprintf(`function (user, context, callback) {\n  const axios = require('axios@0.19.2');\n  \n  if (context.request.query.invited === 'true') {\n    const options = { method: 'POST',\n    \turl: \"%s/api/v2/users/teams/default/invitations/accept\",\n    \theaders: { 'content-type': 'application/json' },\n    \tdata: JSON.stringify({ \n        user_id: context.request.query.user_id, \n        auth0_id: user.user_id, \n        name: user.name,\n        invitation_id: context.request.query.invitation_id\n      })\n     };\n  \taxios(options);\n  }\n  return callback(null, user, context);\n}`, hostApi)
 	addRules(domain, rule2, script2, token)
 
-
-
-
-
-
 }
 
 func addRules(domain string, name string, script string, token string) {
