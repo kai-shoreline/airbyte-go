@@ -38,8 +38,8 @@ func main() {
   postgresDefinitionId := getDestinationDefinitionID(workspaceId, "postgres")
   fmt.Printf("%+v\n",postgresDefinitionId)
 
-  definitionId := getDestinationID(postgresDefinitionId, workspaceId, "f1PrBXKfKOxSObGbQLGQvs29ck7V6RLXEjyR9bZWUppxqdKpYO", "insights-cluster-jk.cluster-c4wzjyxeyphq.us-east-1.rds.amazonaws.com")
-  fmt.Printf("%+v\n",definitionId)
+  destinationId := getDestinationID(postgresDefinitionId, workspaceId, "f1PrBXKfKOxSObGbQLGQvs29ck7V6RLXEjyR9bZWUppxqdKpYO", "insights-cluster-jk.cluster-c4wzjyxeyphq.us-east-1.rds.amazonaws.com")
+  fmt.Printf("%+v\n",destinationId)
   
   err = cmd.Process.Kill() // stop the command
   if err != nil {
