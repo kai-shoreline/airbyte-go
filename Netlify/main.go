@@ -10,11 +10,42 @@ import (
 )
 
 func main() {
-	createSite("WdxR8VoUhXWRjc7O_KFB2YwMLLpK31BgdkuwduBqCQo")
+	// token := "WdxR8VoUhXWRjc7O_KFB2YwMLLpK31BgdkuwduBqCQo"
+	// createSite(token)
 	
+	
+	createEnvVars("630fe0bf52cd4b08420e2721", "3774be8e-3f12-4231-b7b9-d79a2363e6d8", "tes2321", "tes3222") 
 
+}
 
-
+func createEnvVars(account_id string, site_id string, key string, value string) {
+	url := "https://app.netlify.com/access-control/bb-api/api/v1/accounts/" + account_id + "/env?site_id=" + site_id
+  
+	payload := strings.NewReader(fmt.Sprintf(`[
+	  {
+		  "key": "%s",
+		  "scopes": [
+			  "builds",
+			  "functions",
+			  "runtime",
+			  "post_processing"
+		  ],
+		  "values": [
+			  {
+				  "context": "all",
+				  "value": "%s"
+			  }
+		  ]
+	  }
+  	]`, key, value))
+	body := postAPI(url, payload, "WdxR8VoUhXWRjc7O_KFB2YwMLLpK31BgdkuwduBqCQo")
+	var data []interface{}
+	err := json.Unmarshal([]byte(body), &data)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%v", data)
+	
 }
 
 func createSite(token string) {
@@ -51,12 +82,20 @@ func createSite(token string) {
 	  "created_via": ""
   }`)
   
-	res := postAPI(url, payload, token)
-	fmt.Printf("%v", res)
+  	body := postAPI(url, payload, token)
+
+	fmt.Println(string(body))
+	var data map[string]interface{}
+	err := json.Unmarshal([]byte(body), &data)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("%v", data)
 }
 
 
-func postAPI(url string, payload io.Reader, token string) map[string]interface{} {
+func postAPI(url string, payload io.Reader, token string) []byte {
 	client := &http.Client {
 	}
 	req, err := http.NewRequest("POST", url, payload)
@@ -82,11 +121,5 @@ func postAPI(url string, payload io.Reader, token string) map[string]interface{}
 	  fmt.Println(err)
 	  return nil
 	}
-	fmt.Println(string(body))
-	var data map[string]interface{}
-	err = json.Unmarshal([]byte(body), &data)
-	if err != nil {
-		panic(err)
-	}
-	return data
+	return body
   }
