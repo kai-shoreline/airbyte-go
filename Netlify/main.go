@@ -14,7 +14,7 @@ func main() {
 	
 	teamName := "Shoreline"
 	token := "WdxR8VoUhXWRjc7O_KFB2YwMLLpK31BgdkuwduBqCQo"
-	domain := "test6-insights.shoreline.io"
+	domain := "test7-insights.shoreline.io"
 	account := getAccount(token, teamName)
 	
 	account_slug := account[0]
@@ -55,7 +55,7 @@ func main() {
 
 func getAccount(token string, teamName string) [2]string {
 	url := "https://app.netlify.com/access-control/bb-api/api/v1/accounts"
-	body := getAPI(url, token)
+	body := useAPI(url, nil, token)
 	// fmt.Println(string(body))
 	var data []interface{}
 	err := json.Unmarshal([]byte(body), &data)
@@ -82,7 +82,7 @@ func createDnsZone(account_slug string, name string, token string) {
 		"name": "%s",
 		"account_slug": "%s"
 	}`,name, account_slug))
-	body := postAPI(url, payload, token)
+	body := useAPI(url, payload, token)
 
 	fmt.Println(string(body))
 	var data map[string]interface{}
@@ -115,7 +115,7 @@ func createEnvVars(account_id string, site_id string, key string, value string) 
 		  ]
 	  }
   	]`, key, value))
-	body := postAPI(url, payload, "WdxR8VoUhXWRjc7O_KFB2YwMLLpK31BgdkuwduBqCQo")
+	body := useAPI(url, payload, "WdxR8VoUhXWRjc7O_KFB2YwMLLpK31BgdkuwduBqCQo")
 	var data []interface{}
 	err := json.Unmarshal([]byte(body), &data)
 	if err != nil {
@@ -160,7 +160,7 @@ func createSite(account_slug string, domain string, token string) map[string]int
 	  "created_via": ""
   }`, account_slug, domain))
   
-  	body := postAPI(url, payload, token)
+  	body := useAPI(url, payload, token)
 
 	fmt.Println(string(body))
 	var data map[string]interface{}
@@ -174,39 +174,15 @@ func createSite(account_slug string, domain string, token string) map[string]int
 }
 
 
-func postAPI(url string, payload io.Reader, token string) []byte {
+func useAPI(url string, payload io.Reader, token string) []byte {
 	client := &http.Client {
 	}
-	req, err := http.NewRequest("POST", url, payload)
-  
-	if err != nil {
-	  fmt.Println(err)
-	  return nil
-	}
-	if token != "" {
-	  req.Header.Add("Authorization", "Bearer " + token) 
-	}
-	req.Header.Add("Content-Type", "application/json")
-  
-	res, err := client.Do(req)
-	if err != nil {
-	  fmt.Println(err)
-	  return nil
-	}
-	defer res.Body.Close()
-  
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-	  fmt.Println(err)
-	  return nil
-	}
-	return body
-  }
-
-func getAPI(url string, token string) []byte {
-	client := &http.Client {
-	}
-	req, err := http.NewRequest("GET", url, nil)
+	
+	action := "POST"
+	if payload == nil {
+		action = "GET"
+	} 
+	req, err := http.NewRequest(action, url, payload)
   
 	if err != nil {
 	  fmt.Println(err)
